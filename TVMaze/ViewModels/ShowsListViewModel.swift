@@ -1,44 +1,45 @@
 import Foundation
-import Combine
 
 @MainActor
 final class ShowsListViewModel: ObservableObject {
     @Published private(set) var shows: [Show] = []
     @Published private(set) var isLoading = false
+    @Published private(set) var isSearching = false
     @Published private(set) var error: Error?
     @Published private(set) var searchResults: [SearchResult] = []
+    
     @Published var searchQuery = ""
     
     private var currentPage = 0
     private var canLoadMorePages = true
-    private var searchTask: Task<Void, Never>?
+    private var searchTask: Task<Void, Error>?
     private let service: TVMazeServiceProtocol
-    private var cancellables = Set<AnyCancellable>()
     
     init(service: TVMazeServiceProtocol = TVMazeService()) {
         self.service = service
-        setupSearchSubscription()
     }
     
-    private func setupSearchSubscription() {
-        $searchQuery
-            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
-            .removeDuplicates()
-            .sink { [weak self] query in
-                self?.performSearch(query: query)
-            }
-            .store(in: &cancellables)
+    func debounceAndSearch(query: String) {
+        searchTask?.cancel()
+        
+        searchTask = Task {
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            await performSearch(query: query)
+        }
     }
     
     func loadInitialPage() async {
+        guard !isSearching else { return }
         await loadNextPage()
     }
     
     func loadNextPage() async {
-        guard !isLoading && canLoadMorePages else { return }
+        guard !isLoading && !isSearching && canLoadMorePages else { return }
         
         isLoading = true
         error = nil
+        defer { isLoading = false }
         
         do {
             let newShows = try await service.fetchShows(page: currentPage)
@@ -49,43 +50,43 @@ final class ShowsListViewModel: ObservableObject {
                 currentPage += 1
             }
         } catch {
-            self.error = error
+            if !isSearching { 
+                self.error = error
+            }
         }
-        
-        isLoading = false
     }
     
-    private func performSearch(query: String) {
-        searchTask?.cancel()
-        
+    private func performSearch(query: String) async {
         guard !query.isEmpty else {
             searchResults = []
+            isSearching = false
+            error = nil
             return
         }
         
-        searchTask = Task { [weak self] in
-            guard let self = self else { return }
-            
-            do {
-                let results = try await service.searchShows(query: query)
-                if !Task.isCancelled {
-                    await MainActor.run {
-                        self.searchResults = results
-                    }
-                }
-            } catch {
-                if !Task.isCancelled {
-                    await MainActor.run {
-                        self.error = error
-                    }
-                }
+        guard !isLoading else { return }
+        
+        isSearching = true
+        error = nil
+        defer { isSearching = false }
+
+        do {
+            let results = try await service.searchShows(query: query)
+            if !Task.isCancelled {
+                self.searchResults = results
+            }
+        } catch {
+            if !Task.isCancelled {
+                self.error = error
             }
         }
     }
     
     func resetSearch() {
+        searchTask?.cancel()
         searchQuery = ""
         searchResults = []
+        isSearching = false
         error = nil
     }
 } 

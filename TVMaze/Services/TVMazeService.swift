@@ -9,7 +9,6 @@ protocol TVMazeServiceProtocol {
     func fetchEpisodeDetails(id: Int) async throws -> Episode
 }
 
-// MARK: - Service Implementation
 final class TVMazeService: TVMazeServiceProtocol {
     private let networkManager: NetworkManaging
     
