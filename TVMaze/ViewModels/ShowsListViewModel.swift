@@ -20,6 +20,7 @@ final class ShowsListViewModel: ObservableObject {
     }
     
     func debounceAndSearch(query: String) {
+        isSearching = true
         searchTask?.cancel()
         
         searchTask = Task {
