@@ -31,6 +31,11 @@ struct SeasonEpisodesView: View {
                 await viewModel.loadEpisodes()
             }
         }
+        .onChange(of: viewModel.seasonId) { oldValue, newValue in
+            Task {
+                await viewModel.loadEpisodes()
+            }
+        }
         .alert("Error", isPresented: .constant(viewModel.error != nil), presenting: viewModel.error) { _ in
             Button("OK") { }
         } message: { error in
@@ -94,7 +99,6 @@ struct SeasonEpisodesView: View {
                     }
                 }
             } else {
-                // No image URL at all
                 PlaceholderImageView(systemName: "tv.slash")
             }
             

@@ -7,7 +7,7 @@ final class SeasonEpisodesViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var error: Error?
     
-    private let seasonId: Int
+    var seasonId: Int
     private let service: TVMazeServiceProtocol
     
     init(seasonId: Int, service: TVMazeServiceProtocol = TVMazeService()) {
@@ -27,10 +27,5 @@ final class SeasonEpisodesViewModel: ObservableObject {
         }
         
         isLoading = false
-    }
-    
-    func episode(at index: Int) -> Episode? {
-        guard index >= 0 && index < episodes.count else { return nil }
-        return episodes[index]
     }
 } 

@@ -77,16 +77,11 @@ struct ShowDetailView: View {
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     default:
-                        EmptyView()
+                        PlaceholderImageView(systemName: "tv", height: 225, backgroundColor: .gray.opacity(0.2), iconColor: .gray)
                     }
                 }
             } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 150, height: 225)
-                    .background(Color.gray.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                PlaceholderImageView(systemName: "tv", height: 225, backgroundColor: .gray.opacity(0.2), iconColor: .gray)
             }
             
             VStack(alignment: .leading, spacing: 10) {
@@ -220,6 +215,7 @@ struct ShowDetailView: View {
             
             if let seasonId = selectedSeasonId {
                 SeasonEpisodesView(seasonId: seasonId)
+                    .id(seasonId)
             }
         }
     }

@@ -28,7 +28,7 @@ struct ShowCardView: View {
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(8)
                 default:
-                    EmptyView()
+                    PlaceholderImageView(systemName: "tv", height: 120, backgroundColor: .gray.opacity(0.2), iconColor: .gray)
                 }
             }
 
