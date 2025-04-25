@@ -68,56 +68,60 @@ struct SeasonEpisodesView: View {
     }
     
     private func episodeRow(episode: Episode) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(episode.name)
-                    .font(.headline)
-                    .lineLimit(1)
-                
-                Spacer()
-                
-                if let number = episode.number {
-                    Text("Ep. \(number)")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 50, alignment: .leading)
-                } else {
-                    Text("Special")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 70, alignment: .leading)
-                }
-            }
-            
-            if let imageUrl = episode.image?.medium {
-                AsyncImage(url: URL(string: imageUrl)) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(height: 150)
-                            .frame(maxWidth: .infinity)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    case .failure, .empty:
-                        PlaceholderImageView(systemName: "tv.slash")
-                    default:
-                        PlaceholderImageView()
+        NavigationLink(destination: EpisodeDetailView(episodeId: episode.id)) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(episode.name)
+                        .font(.headline)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    if let number = episode.number {
+                        Text("Ep. \(number)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .frame(width: 50, alignment: .leading)
+                    } else {
+                        Text("Special")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .frame(width: 70, alignment: .leading)
                     }
                 }
-            } else {
-                PlaceholderImageView(systemName: "tv.slash")
+                
+                if let imageUrl = episode.image?.medium {
+                    AsyncImage(url: URL(string: imageUrl)) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 150)
+                                .frame(maxWidth: .infinity)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        case .failure, .empty:
+                            PlaceholderImageView(systemName: "tv.slash")
+                        default:
+                            PlaceholderImageView()
+                        }
+                    }
+                } else {
+                    PlaceholderImageView(systemName: "tv.slash")
+                }
+                
+                if !episode.summary.isEmpty {
+                    Text(episode.summary)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+                
+                Divider()
             }
-            
-            if !episode.summary.isEmpty {
-                Text(episode.summary)
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
-            
-            Divider()
+            .contentShape(Rectangle()) // Make entire area tappable
         }
+        .buttonStyle(PlainButtonStyle()) // Prevent navigation link styling from affecting custom styling
     }
 }
 
