@@ -15,17 +15,19 @@ struct ShowsListView: View {
         NavigationStack {
             List {
                 ForEach(showsToDisplay) { show in
-                    ShowCardView(show: show)
-                        .onAppear {
-                            if show.id == showsToDisplay.last?.id && !isSearchingActive && !viewModel.isLoading {
-                                Task {
-                                    await viewModel.loadNextPage()
+                    NavigationLink(destination: ShowDetailView(showId: show.id)) {
+                        ShowCardView(show: show)
+                            .onAppear {
+                                if show.id == showsToDisplay.last?.id && !isSearchingActive && !viewModel.isLoading {
+                                    Task {
+                                        await viewModel.loadNextPage()
+                                    }
                                 }
                             }
-                        }
-                        .listRowInsets(EdgeInsets())
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
+                    }
+                    .listRowInsets(EdgeInsets())
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
                 }
                 
                 if viewModel.isLoading && !isSearchingActive {
