@@ -242,9 +242,3 @@ struct ShowDetailView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        ShowDetailView(showId: 1)
-    }
-}

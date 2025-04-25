@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SeasonEpisodesView: View {
     @StateObject private var viewModel: SeasonEpisodesViewModel
+    @State private var episodeToShow: Episode?
     
     init(seasonId: Int) {
         _viewModel = StateObject(wrappedValue: SeasonEpisodesViewModel(seasonId: seasonId))
@@ -36,6 +37,9 @@ struct SeasonEpisodesView: View {
                 await viewModel.loadEpisodes()
             }
         }
+        .sheet(item: $episodeToShow) { episode in
+            EpisodeDetailView(episodeId: episode.id)
+        }
         .alert("Error", isPresented: .constant(viewModel.error != nil), presenting: viewModel.error) { _ in
             Button("OK") { }
         } message: { error in
@@ -68,60 +72,60 @@ struct SeasonEpisodesView: View {
     }
     
     private func episodeRow(episode: Episode) -> some View {
-        NavigationLink(destination: EpisodeDetailView(episodeId: episode.id)) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(episode.name)
-                        .font(.headline)
-                        .lineLimit(1)
-                    
-                    Spacer()
-                    
-                    if let number = episode.number {
-                        Text("Ep. \(number)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .frame(width: 50, alignment: .leading)
-                    } else {
-                        Text("Special")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .frame(width: 70, alignment: .leading)
-                    }
-                }
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(episode.name)
+                    .font(.headline)
+                    .lineLimit(1)
                 
-                if let imageUrl = episode.image?.medium {
-                    AsyncImage(url: URL(string: imageUrl)) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(height: 150)
-                                .frame(maxWidth: .infinity)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        case .failure, .empty:
-                            PlaceholderImageView(systemName: "tv.slash")
-                        default:
-                            PlaceholderImageView()
-                        }
-                    }
-                } else {
-                    PlaceholderImageView(systemName: "tv.slash")
-                }
+                Spacer()
                 
-                if !episode.summary.isEmpty {
-                    Text(episode.summary)
-                        .font(.footnote)
+                if let number = episode.number {
+                    Text("Ep. \(number)")
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
-                        .lineLimit(2)
+                        .frame(width: 50, alignment: .leading)
+                } else {
+                    Text("Special")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(width: 70, alignment: .leading)
                 }
-                
-                Divider()
             }
-            .contentShape(Rectangle()) // Make entire area tappable
+            
+            if let imageUrl = episode.image?.medium {
+                AsyncImage(url: URL(string: imageUrl)) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(height: 150)
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    case .failure, .empty:
+                        PlaceholderImageView(systemName: "tv.slash")
+                    default:
+                        PlaceholderImageView()
+                    }
+                }
+            } else {
+                PlaceholderImageView(systemName: "tv.slash")
+            }
+            
+            if !episode.summary.isEmpty {
+                Text(episode.summary)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+            
+            Divider()
         }
-        .buttonStyle(PlainButtonStyle()) // Prevent navigation link styling from affecting custom styling
+        .contentShape(Rectangle()) 
+        .onTapGesture { 
+            episodeToShow = episode
+        }
     }
 }
 
