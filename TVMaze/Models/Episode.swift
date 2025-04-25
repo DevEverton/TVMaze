@@ -4,7 +4,7 @@ struct Episode: Identifiable, Decodable {
     let id: Int
     let name: String
     let season: Int
-    let number: Int
+    let number: Int?
     let summary: String
     let image: ImageResponse?
 
@@ -17,7 +17,7 @@ struct Episode: Identifiable, Decodable {
         id = try container.decode(Int.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         season = try container.decode(Int.self, forKey: .season)
-        number = try container.decode(Int.self, forKey: .number)
+        number = try container.decodeIfPresent(Int.self, forKey: .number)
         image = try container.decodeIfPresent(ImageResponse.self, forKey: .image)
         
         let rawSummary = try container.decodeIfPresent(String.self, forKey: .summary)

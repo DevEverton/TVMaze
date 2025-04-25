@@ -21,7 +21,7 @@ final class SeasonEpisodesViewModel: ObservableObject {
         
         do {
             let episodes = try await service.fetchEpisodes(seasonId: seasonId)
-            self.episodes = episodes.sorted { $0.number < $1.number }
+            self.episodes = episodes
         } catch {
             self.error = error
         }

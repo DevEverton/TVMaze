@@ -157,13 +157,35 @@ struct ShowDetailView: View {
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.blue.opacity(0.1))
-                            .foregroundColor(.blue)
+                            .background(colorForGenre(genre).opacity(0.15))
+                            .foregroundColor(colorForGenre(genre))
                             .clipShape(Capsule())
                     }
                 }
             }
         }
+    }
+    
+    private func colorForGenre(_ genre: String) -> Color {
+        let colorPalette: [Color] = [
+            .blue,
+            .red,
+            .green,
+            .orange,
+            .purple,
+            .pink,
+            .teal,
+            .indigo,
+            .yellow,
+            .gray,
+            .brown,
+            .mint,
+            .cyan,
+            .accentColor
+        ]
+        
+        let index = abs(genre.hashValue) % colorPalette.count
+        return colorPalette[index]
     }
     
     private func summaryView(summary: String) -> some View {

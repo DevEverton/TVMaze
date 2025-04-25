@@ -76,10 +76,17 @@ struct SeasonEpisodesView: View {
                 
                 Spacer()
                 
-                Text("Ep. \(episode.number)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(width: 50, alignment: .leading)
+                if let number = episode.number {
+                    Text("Ep. \(number)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(width: 50, alignment: .leading)
+                } else {
+                    Text("Special")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(width: 70, alignment: .leading)
+                }
             }
             
             if let imageUrl = episode.image?.medium {
