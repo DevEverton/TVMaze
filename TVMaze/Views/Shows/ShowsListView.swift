@@ -32,6 +32,7 @@ struct ShowsListView: View {
             }
             .listStyle(.plain)
             .navigationTitle("TVMaze")
+            .navigationBarTitleDisplayMode(.large)
             .searchable(text: $viewModel.searchQuery, prompt: "Search Shows")
             .onChange(of: viewModel.searchQuery) { oldValue, newValue in
                 if !viewModel.searchQuery.isEmpty {
