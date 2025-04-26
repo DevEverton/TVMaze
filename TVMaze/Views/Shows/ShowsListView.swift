@@ -29,16 +29,6 @@ struct ShowsListView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 4)
                 }
-                
-                if viewModel.isLoading && !isSearchingActive {
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                            .padding()
-                        Spacer()
-                    }
-                    .listRowSeparator(.hidden)
-                }
             }
             .listStyle(.plain)
             .navigationTitle("TVMaze")
@@ -49,13 +39,17 @@ struct ShowsListView: View {
                 }
             }
             .overlay {
-                if viewModel.isSearching {
+                if viewModel.isLoading && !isSearchingActive {
+                    ProgressView("Loading shows...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.ultraThinMaterial)
+                } else if viewModel.isSearching {
                     ProgressView("Searching...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(.ultraThinMaterial)
-                } else if showsToDisplay.isEmpty {
+                } else if showsToDisplay.isEmpty && !viewModel.isLoading {
                     if isSearchingActive {
-                        contentUnavailableView(label: "No shows found", systemImage: "tray.fill", description: "No shows found for \"\(viewModel.searchQuery)\"")   
+                        contentUnavailableView(label: "No shows found", systemImage: "tray.fill", description: "No shows found for \"\(viewModel.searchQuery)\"")
                     } else if !viewModel.isLoading {
                         contentUnavailableView(label: "No shows loaded", systemImage: "tv", description: "Shows will appear here")
                     } else if viewModel.shows.isEmpty && !viewModel.isLoading {
@@ -89,4 +83,4 @@ struct ShowsListView: View {
 
 #Preview {
     ShowsListView()
-} 
+}

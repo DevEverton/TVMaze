@@ -11,7 +11,6 @@ final class ShowsListViewModel: ObservableObject {
     @Published var searchQuery = ""
     
     private var currentPage = 0
-    private var canLoadMorePages = true
     private var searchTask: Task<Void, Error>?
     private let service: TVMazeServiceProtocol
     
@@ -36,7 +35,7 @@ final class ShowsListViewModel: ObservableObject {
     }
     
     func loadNextPage() async {
-        guard !isLoading && !isSearching && canLoadMorePages else { return }
+        guard !isLoading && !isSearching else { return }
         
         isLoading = true
         error = nil
@@ -44,12 +43,8 @@ final class ShowsListViewModel: ObservableObject {
         
         do {
             let newShows = try await service.fetchShows(page: currentPage)
-            if newShows.isEmpty {
-                canLoadMorePages = false
-            } else {
-                shows.append(contentsOf: newShows)
-                currentPage += 1
-            }
+            shows.append(contentsOf: newShows)
+            currentPage += 1
         } catch {
             if !isSearching { 
                 self.error = error
