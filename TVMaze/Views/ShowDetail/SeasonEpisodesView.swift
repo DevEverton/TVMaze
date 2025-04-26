@@ -3,6 +3,8 @@ import SwiftUI
 struct SeasonEpisodesView: View {
     @StateObject private var viewModel: SeasonEpisodesViewModel
     @State private var episodeToShow: Episode?
+    @State private var previousEpisodes: [Episode] = []
+    @Environment(\.seasonEpisodeId) private var environmentSeasonId: Int
     
     init(seasonId: Int) {
         _viewModel = StateObject(wrappedValue: SeasonEpisodesViewModel(seasonId: seasonId))
@@ -14,17 +16,31 @@ struct SeasonEpisodesView: View {
                 .font(.headline)
                 .padding(.top, 8)
             
-            if viewModel.isLoading {
-                episodesList
-                    .overlay(
-                        ProgressView("Loading details...")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.ultraThinMaterial)
-                    )
-            } else if viewModel.episodes.isEmpty {
-                emptyEpisodesView
-            } else {
-                episodesList
+            ZStack {
+                if viewModel.isLoading && viewModel.episodes.isEmpty && previousEpisodes.isEmpty {
+                    emptyEpisodesView
+                        .overlay(
+                            ProgressView("Loading details...")
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(.ultraThinMaterial)
+                        )
+                } else if !viewModel.isLoading && viewModel.episodes.isEmpty {
+                    emptyEpisodesView
+                } else {
+                    if viewModel.isLoading && viewModel.episodes.isEmpty {
+                        episodeListView(episodes: previousEpisodes)
+                            .overlay(loadingOverlay)
+                    } else {
+                        episodeListView(episodes: viewModel.episodes)
+                            .overlay(
+                                Group {
+                                    if viewModel.isLoading {
+                                        loadingOverlay
+                                    }
+                                }
+                            )
+                    }
+                }
             }
         }
         .onAppear {
@@ -32,9 +48,22 @@ struct SeasonEpisodesView: View {
                 await viewModel.loadEpisodes()
             }
         }
-        .onChange(of: viewModel.seasonId) { oldValue, newValue in
-            Task {
-                await viewModel.loadEpisodes()
+        .onChange(of: environmentSeasonId) { oldValue, newValue in
+            if newValue != 0 && newValue != viewModel.seasonId {
+                if !viewModel.episodes.isEmpty {
+                    previousEpisodes = viewModel.episodes
+                }
+                
+                viewModel.seasonId = newValue
+                
+                Task {
+                    await viewModel.loadEpisodes()
+                }
+            }
+        }
+        .onChange(of: viewModel.episodes) { oldValue, newValue in
+            if !newValue.isEmpty {
+                previousEpisodes = newValue
             }
         }
         .sheet(item: $episodeToShow) { episode in
@@ -55,9 +84,15 @@ struct SeasonEpisodesView: View {
         }
     }
     
-    private var episodesList: some View {
+    private var loadingOverlay: some View {
+        ProgressView("Loading details...")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.ultraThinMaterial)
+    }
+    
+    private func episodeListView(episodes: [Episode]) -> some View {
         LazyVStack(alignment: .leading, spacing: 16) {
-            ForEach(viewModel.episodes) { episode in
+            ForEach(episodes) { episode in
                 episodeRow(episode: episode)
             }
         }

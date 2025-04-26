@@ -1,6 +1,6 @@
 import Foundation
  
-struct Episode: Identifiable, Decodable {
+struct Episode: Identifiable, Decodable, Equatable {
     let id: Int
     let name: String
     let season: Int
@@ -22,5 +22,9 @@ struct Episode: Identifiable, Decodable {
         
         let rawSummary = try container.decodeIfPresent(String.self, forKey: .summary)
         summary = rawSummary?.strippedHTML ?? "No description available"
+    }
+
+    static func == (lhs: Episode, rhs: Episode) -> Bool {
+        return lhs.id == rhs.id
     }
 }

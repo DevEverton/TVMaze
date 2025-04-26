@@ -235,8 +235,20 @@ struct ShowDetailView: View {
             
             if let seasonId = selectedSeasonId {
                 SeasonEpisodesView(seasonId: seasonId)
-                    .id(seasonId)
+                    .environment(\.seasonEpisodeId, seasonId)
             }
         }
     }
 }
+
+private struct SeasonEpisodeIdKey: EnvironmentKey {
+    static let defaultValue: Int = 0
+}
+
+extension EnvironmentValues {
+    var seasonEpisodeId: Int {
+        get { self[SeasonEpisodeIdKey.self] }
+        set { self[SeasonEpisodeIdKey.self] = newValue }
+    }
+}
+
