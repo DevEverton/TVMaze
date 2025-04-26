@@ -6,7 +6,7 @@
 
 ## Description
 
-This iOS application allows users to browse, search, and view details about TV shows and their episodes, leveraging the [TVMaze API](https://www.tvmaze.com/api). Users can see a list of shows, view detailed information about a specific show including its seasons and episodes, and mark favorite shows (feature assumed, please verify/add details).
+This iOS application allows users to browse, search, and view details about TV shows and their episodes, leveraging the [TVMaze API](https://www.tvmaze.com/api). Users can see a list of shows, view detailed information about a specific show including its seasons and episodes.
 
 ## Features
 
