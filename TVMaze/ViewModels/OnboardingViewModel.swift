@@ -6,6 +6,7 @@ final class OnboardingViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var showAuthError = false
     @Published var authErrorMessage = ""
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
     func authenticateUser() {
         let context = LAContext()
@@ -18,6 +19,7 @@ final class OnboardingViewModel: ObservableObject {
                 Task { @MainActor in
                     if success {
                         self.isAuthenticated = true
+                        self.hasCompletedOnboarding = true
                     } else {
                         self.authErrorMessage = error?.localizedDescription ?? "Authentication failed"
                         self.showAuthError = true
@@ -31,6 +33,7 @@ final class OnboardingViewModel: ObservableObject {
                 Task { @MainActor in
                     if success {
                         self.isAuthenticated = true
+                        self.hasCompletedOnboarding = true
                     } else {
                         self.authErrorMessage = error?.localizedDescription ?? "Authentication failed"
                         self.showAuthError = true

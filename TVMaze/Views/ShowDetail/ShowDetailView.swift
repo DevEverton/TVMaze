@@ -177,11 +177,9 @@ struct ShowDetailView: View {
             .teal,
             .indigo,
             .yellow,
-            .gray,
             .brown,
             .mint,
-            .cyan,
-            .accentColor
+            .cyan
         ]
         
         let index = abs(genre.hashValue) % colorPalette.count

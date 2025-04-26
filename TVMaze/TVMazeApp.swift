@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct TVMazeApp: App {
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
     var body: some Scene {
         WindowGroup {
-            OnboardingView()
+            ShowsListView()
+                .fullScreenCover(isPresented: .constant(!hasCompletedOnboarding)) {
+                    OnboardingView()
+                }
         }
     }
 }
