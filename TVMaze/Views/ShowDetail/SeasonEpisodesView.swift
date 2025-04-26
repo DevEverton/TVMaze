@@ -15,12 +15,12 @@ struct SeasonEpisodesView: View {
                 .padding(.top, 8)
             
             if viewModel.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView("Loading episodes...")
-                    Spacer()
-                }
-                .padding()
+                episodesList
+                    .overlay(
+                        ProgressView("Loading details...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.ultraThinMaterial)
+                    )
             } else if viewModel.episodes.isEmpty {
                 emptyEpisodesView
             } else {
@@ -48,18 +48,10 @@ struct SeasonEpisodesView: View {
     }
     
     private var emptyEpisodesView: some View {
-        HStack {
-            Spacer()
-            VStack(spacing: 10) {
-                Image(systemName: "tv.slash")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
-                Text("No episodes available")
-                    .font(.callout)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            Spacer()
+        ContentUnavailableView {
+            Label("No episodes available", systemImage: "tv.slash")
+        } description: {
+            Text("Episodes will appear here")
         }
     }
     
@@ -122,8 +114,8 @@ struct SeasonEpisodesView: View {
             
             Divider()
         }
-        .contentShape(Rectangle()) 
-        .onTapGesture { 
+        .contentShape(Rectangle())
+        .onTapGesture {
             episodeToShow = episode
         }
     }
